@@ -5,7 +5,7 @@
 #include <set>
 #include <string>
 #include <map>
-
+#include <cstdio>
 using std::pair;
 using std::set;
 using std::map;
