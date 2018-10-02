@@ -301,7 +301,7 @@ void game_base::update() {
 }
 void display_manager::run_check() {
 
-    check = false;
+    check = false; 
 game_control->update();
 
 }
