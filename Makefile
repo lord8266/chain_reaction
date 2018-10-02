@@ -1,0 +1,9 @@
+P=$(m)
+pks= sdl2 SDL2_image SDL2_ttf
+CFLAGS=-Wall -Wno-unused-variable -Wno-unused-value  -std=gnu++17 -g `pkg-config --cflags $(pks)`
+
+OBJECTS=
+LDLIBS= `pkg-config --libs $(pks)`
+
+all:
+	g++ $(CFLAGS) $(P).cc $(OBJECTS) -o $(P) $(LDLIBS)
