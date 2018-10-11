@@ -15,7 +15,7 @@ As soon as a player looses all their orbs they are out of the game.
 
 ## Status : Not Completed
   as of now only has the chain reaction is coded
-  and a basic texture is used
+  and a basic textures are used
   i will contiue when i have time
 
   look at gameplays for how it looks
