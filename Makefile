@@ -4,6 +4,7 @@ CFLAGS=-Wall -Wno-unused-variable -Wno-unused-value  -std=gnu++17 -g `pkg-config
 
 OBJECTS=
 LDLIBS= `pkg-config --libs $(pks)`
+dir = sources
 
-all:
-	g++ $(CFLAGS) $(P).cc $(OBJECTS) -o $(P) $(LDLIBS)
+all: $(dir)/header.h
+	g++ $(CFLAGS) $(dir)/chainreaction.cc  -o $(P) $(LDLIBS)
