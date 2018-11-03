@@ -1,4 +1,4 @@
-P=$(m)
+P=chain
 pks= sdl2 SDL2_image SDL2_ttf
 CFLAGS=-Wall -Wno-unused-variable -Wno-unused-value  -std=gnu++17 -g `pkg-config --cflags $(pks)`
 
@@ -7,7 +7,6 @@ LDLIBS= `pkg-config --libs $(pks)`
 
 all: main.h main.cc $(OBJECTS)
 	g++ $(CFLAGS) main.cc $(OBJECTS) -o $(P) $(LDLIBS)
-	mv $(P) ../$(P)
 
 game_base.o: game_base.h game_base.cc
 	g++ $(CFLAGS) -c game_base.cc -o game_base.o $(LDLIBS)
@@ -32,6 +31,3 @@ event_manager.o: event_manager.h event_manager.cc
 
 animation.o: animation.h animation.cc
 	g++ $(CFLAGS) -c animation.cc -o animation.o $(LDLIBS)
-
-clear:
-	rm *.o
