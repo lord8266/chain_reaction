@@ -150,8 +150,15 @@ void display_manager::setup() {
 
   w1 = SDL_CreateWindow("test",640,480,500,500,SDL_WINDOW_SHOWN);
   cout<<w1<<endl;
+  if (!w1){
+    cout<<SDL_GetError()<<endl;
+  }
   w_ren = SDL_CreateRenderer(w1,-1,SDL_RENDERER_ACCELERATED| SDL_RENDERER_PRESENTVSYNC);
   cout<<w_ren<<endl;
+  if (!wren){
+    cout<<SDL_GetError()<<endl;
+  }
+
   //make_textures(); // make all textures need to display on
   make_atoms();
   r_text.w=50;
