@@ -20,7 +20,6 @@ public:
   void render(); //render graphics
   void process_events();
   void draw_grid(); // function to draw the grid as of now is 500x500 grid
-  void make_textures(); // make textures for rendering
   void make_atoms();
   void user_event(const int&); // when the user clicks send the event
   void color_change(const int&); //utility function to revert back to the previously used color

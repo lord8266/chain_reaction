@@ -179,40 +179,6 @@ void display_manager::make_atoms() {
 
 //----------------------------------------------------------------------
 
-void display_manager::make_textures() {
-  /*
-  as of now this makes textures 1 2 3 for
-  displaying the count of atoms in the
-  box
-  */
-
-  TTF_Init(); // initialize ttf
-  TTF_Font *temp_font = TTF_OpenFont("textures/arial.ttf",28); // take font from arial
-  SDL_Color color1{100,0,100,255}; // make a color variable
-
-  SDL_Surface *temp = TTF_RenderText_Solid(temp_font,"0",color1); // render text
-  SDL_Texture *temp_texture = SDL_CreateTextureFromSurface(w_ren,temp);
-  SDL_FreeSurface(temp);
-  value_maps.insert({0,temp_texture});
-
-  temp = TTF_RenderText_Solid(temp_font,"1",color1);
-  temp_texture = SDL_CreateTextureFromSurface(w_ren,temp);
-  SDL_FreeSurface(temp);
-  value_maps.insert({1,temp_texture});
-
-  temp = TTF_RenderText_Solid(temp_font,"2",color1);
-  temp_texture = SDL_CreateTextureFromSurface(w_ren,temp);
-  SDL_FreeSurface(temp);
-  value_maps.insert({2,temp_texture});
-
-  temp = TTF_RenderText_Solid(temp_font,"3",color1);
-  temp_texture = SDL_CreateTextureFromSurface(w_ren,temp);
-  SDL_FreeSurface(temp);
-  value_maps.insert({3,temp_texture});
-  TTF_CloseFont(temp_font); // close everything
-  TTF_Quit(); // quit ttf
-
-}
 
 //----------------------------------------------------------------------
 
