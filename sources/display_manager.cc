@@ -155,7 +155,7 @@ void display_manager::setup() {
   }
   w_ren = SDL_CreateRenderer(w1,-1,SDL_RENDERER_ACCELERATED| SDL_RENDERER_PRESENTVSYNC);
   cout<<w_ren<<endl;
-  if (!wren){
+  if (!w_ren){
     cout<<SDL_GetError()<<endl;
   }
 
