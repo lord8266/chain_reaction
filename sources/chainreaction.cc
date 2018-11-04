@@ -13,11 +13,7 @@ have a receive event which then will increase count
 #include <SDL_image.h>
 
 
-class display_manager;
-class animation;
-class receive_results;
-class player;
-class box;
+
 class game_base {
 public:
   game_base(display_manager*);
@@ -30,6 +26,7 @@ public:
   int player_cnt;
   int current_cnt;
 };
+
 class player {
 public:
   player(const int&,const int&,const int&,game_base*);
@@ -301,7 +298,7 @@ void game_base::update() {
 }
 void display_manager::run_check() {
 
-    check = false; 
+    check = false;
 game_control->update();
 
 }
