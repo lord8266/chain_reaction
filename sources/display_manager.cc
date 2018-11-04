@@ -147,8 +147,11 @@ void display_manager::user_event(const int& i) { // user event
 
 void display_manager::setup() {
   SDL_Init(SDL_INIT_VIDEO);
+
   w1 = SDL_CreateWindow("test",640,480,500,500,SDL_WINDOW_SHOWN);
+  cout<<w1<<endl;
   w_ren = SDL_CreateRenderer(w1,-1,SDL_RENDERER_ACCELERATED| SDL_RENDERER_PRESENTVSYNC);
+  cout<<w_ren<<endl;
   //make_textures(); // make all textures need to display on
   make_atoms();
   r_text.w=50;
