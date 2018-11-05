@@ -160,6 +160,10 @@ void display_manager::setup() {
   SDL_Init(SDL_INIT_VIDEO);
   int width = game_details->x*game_details->w;
   int height = game_details->y*game_details->h;
+  int num = SDL_GetNumVideoDrivers();
+  for (int i=0;i!=num;i++) {
+    cout<<"driver : "<<SDL_GetVideoDriver(i)<<endl;
+  }
   w1 = SDL_CreateWindow("test",640,480,width,height,SDL_WINDOW_SHOWN);
   w_ren = SDL_CreateRenderer(w1,-1,SDL_RENDERER_ACCELERATED| SDL_RENDERER_PRESENTVSYNC);
   //make_textures(); // make all textures need to display on
@@ -370,7 +374,7 @@ void display_manager::set_type() {
 
   boxes[i].type = type::TOPRC;
   boxes[i].max =1; //sets maximum
-
+  i++;
   for(;i<(rows-1)*cols;i++) {
 
          if(i%cols==0){
@@ -386,8 +390,7 @@ void display_manager::set_type() {
            boxes[i].max =3; //sets maximum
          }
   }
-  boxes[i].type = type::BOTTOMLC; // bottom row left
-  boxes[i].max =1; //sets maximum
+
   for(;i<rows*cols-1;i++) { // bottom row
 
           boxes[i].type = type::BOTTOM;
