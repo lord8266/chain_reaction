@@ -9,7 +9,6 @@ have a receive event which then will increase count
 
 #include "header.h" //includes all necessary libararies
 #include <SDL.h>
-#include <SDL_ttf.h>
 #include <SDL_image.h>
 
 

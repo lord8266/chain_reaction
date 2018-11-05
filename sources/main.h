@@ -7,10 +7,13 @@
 #include <string>
 #include <map>
 #include <cstdio>
+#include <cmath>
+#include <memory>
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
+using std::allocator;
 using std::pair;
 using std::set;
 using std::map;

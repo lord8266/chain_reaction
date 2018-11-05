@@ -3,29 +3,31 @@
 
 #include "main.h"
 
+
+
 class animation {
+  friend class box;
 public:
-  enum direction { // enumeration for direction of animation
-    DOWNWARD= 1,
-    UPWARD=2,
-    LEFTWARD=3,
-    RIGHTWARD=4,
-  };
-  animation(box*,box*,display_manager*,player*);
-  display_manager *connection = nullptr; //pointer to the displayer
+  animation(box*,box*,display_manager*);
   void run();              // run the animation
   void completion_event();  //if completed then put it on the recieve queue of the box
-  box *to =nullptr; // the coordinates to which ball must go
-  box *from =nullptr; //coordinates from which ball has orignated
   void update();              //update location of the ball
-  coordinates *current = nullptr; // the current location of the ball
   void render(); //render the animation
-  int direction = 0; // holds the direction value
   void set_direction(); // function to set the direction of animation
   // it is automatically deduced from the two boxes
-  SDL_Rect rectangle ;// as of now rendering rectangle
-  static int speed;
-  player* owner = nullptr;
+  int speed=4;
+private:
+  display_manager *connection = nullptr; //pointer to the displayer
+  player *owner =nullptr;
+private:
+  box *to =nullptr; // the coordinates to which ball must go
+  box *from =nullptr; //coordinates from which ball has orignated
+  SDL_Rect *current = nullptr; // the current location of the ball
+  SDL_Rect *destination = nullptr;
+  SDL_Point *direction =nullptr;
+  SDL_Color *color = nullptr;
+private:
+  bool running = false;
 };
 
 #endif

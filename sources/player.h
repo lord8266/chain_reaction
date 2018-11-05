@@ -8,8 +8,8 @@ public:
   player(const int&,const int&,const int&,game_base*);
   bool compare_color(box*);
   void update() { holding++;}
-  SDL_Color color;
   game_base *connection =nullptr;
+  SDL_Color *color=nullptr;
   int holding=0;
 };
 

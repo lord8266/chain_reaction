@@ -29,14 +29,11 @@ void event_manager::check_events(SDL_Event* e) {
 void event_manager::handle_click() {
   SDL_GetMouseState(&x,&y); // get mouse location
 
-  if (x > 500|| y>=500) {
-    return;
-  }
-  x = x/100+1; // convert cooridnates to 5,5 range
-  y = y/100;
 
-  connection->user_event(x+5*y); // generate id and send the event
+  x = x/connection->game_details->w;
+  y = y/connection->game_details->h;
+
+  connection->user_event(x+connection->game_details->x*y); // generate id and send the event
 }
 
 //----------------------------------------------------------------------
-

@@ -15,9 +15,9 @@ game_base::game_base(display_manager* d):connection(d),player_cnt(3),current_cnt
 void game_base::update() {
   int r =0,g=0,b=0;
   for (player* p1 : players) {
-    r = p1->color.r;
-    g=p1->color.g;
-    b=p1->color.b;
+    r = p1->color->r;
+    g=p1->color->g;
+    b=p1->color->b;
     cout<<"( "<<r<<" "<<g<<" "<<b<<" ): "<<p1->holding<<"\n";
   }
   cout<<endl;
@@ -40,7 +40,7 @@ void game_base::cycle() {
 //----------------------------------------------------------------------
 
 void game_base::user_event(const int& i) {
-  box* temp_b = connection->boxes[i];
+  box* temp_b = &connection->boxes[i];
 
   if(current->compare_color(temp_b)) {
   temp_b->received(nullptr);
@@ -50,4 +50,3 @@ void game_base::user_event(const int& i) {
 }
 
 //----------------------------------------------------------------------
-

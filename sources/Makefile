@@ -1,8 +1,8 @@
 P=chain
 pks= sdl2 SDL2_image SDL2_ttf
-CFLAGS=-Wall -Wno-unused-variable -Wno-unused-value  -std=gnu++17 -g `pkg-config --cflags $(pks)`
+CFLAGS=-Wall -Wno-unused-variable -Werror -Wno-unused-value  -std=gnu++17 `pkg-config --cflags $(pks)`
 
-OBJECTS= game_base.o  player.o  box.o  receive_results.o  coordinates.o  event_manager.o  display_manager.o  animation.o
+OBJECTS= game_base.o  player.o  box.o  event_manager.o  display_manager.o  animation.o
 LDLIBS= `pkg-config --libs $(pks)`
 
 all: main.h main.cc $(OBJECTS)

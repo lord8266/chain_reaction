@@ -16,18 +16,19 @@ int cols =game_details->x;
 
 
 temp.w = game_details->w;
-temp.h = game_details->h;
+temp->h = game_details->h;
+allocator<box> temp_alloc;
+&boxes = temp_alloc.alloc(rows*cols);
 
-boxes = alloc.allocate(rows*cols);
+  for (int i=0;i<cols;i++) { // for each row
 
-  for (int i=0;i<rows;i++) { // for each row
+    for (int j=0;j<rows;j++) { // for each column
 
-    for (int j=0;j<cols;j++) { // for each column
+      int id = j + i*temp.h;
+      temp.x = i*temp.w;
+      temp.y = j*temp.h
+      temp_alloc.construct(&boxes[id],id,id, temp , this);
 
-      int id = j + i*cols;
-      temp.x = j*temp.w;
-      temp.y = i*temp.h;
-      alloc.construct(boxes+id,id, temp , this);
 
 
       //      id    , x coordinate ,y cooridinate , pointer to displayer
@@ -120,24 +121,21 @@ void display_manager::texture_mod(const int& tex_index,const int& i) {
 
 void display_manager::draw_grid() {
   color_change(0);
-  int width = game_details->x*game_details->w;
-  int height = game_details->y*game_details->h;
-
   if(!running) { // running is false when animation is going on
    SDL_SetRenderDrawColor(w_ren,255,255,255,255);
   }
   else {
 
-  SDL_SetRenderDrawColor(w_ren,grid_color->r,grid_color->g,grid_color->b,255);
+  SDL_SetRenderDrawColor(w_ren,grid_color.r,grid_color.g,grid_color.b,255);
 }
-  for (int i=0;i<height;i+=game_details->h) {
-    SDL_RenderDrawLine(w_ren,0,i,width,i);
+  for (int i=0;i<500;i+=100) {
+    SDL_RenderDrawLine(w_ren,0,i,500,i);
   }
-  SDL_RenderDrawLine(w_ren,0,height-1,width,height-1);
-  for (int i=0;i<width;i+=game_details->w) {
-    SDL_RenderDrawLine(w_ren,i,0,i,height);
+  SDL_RenderDrawLine(w_ren,0,499,500,499);
+  for (int i=0;i<500;i+=100) {
+    SDL_RenderDrawLine(w_ren,i,0,i,500);
   }
-  SDL_RenderDrawLine(w_ren,width-1,0,width-1,height);
+  SDL_RenderDrawLine(w_ren,499,0,499,500);
   color_change(1);
 }
 
@@ -158,9 +156,7 @@ void display_manager::user_event(const int& i) { // user event
 
 void display_manager::setup() {
   SDL_Init(SDL_INIT_VIDEO);
-  int width = game_details->x*game_details->w;
-  int height = game_details->y*game_details->h;
-  w1 = SDL_CreateWindow("test",640,480,width,height,SDL_WINDOW_SHOWN);
+  w1 = SDL_CreateWindow("test",640,480,500,500,SDL_WINDOW_SHOWN);
   w_ren = SDL_CreateRenderer(w1,-1,SDL_RENDERER_ACCELERATED| SDL_RENDERER_PRESENTVSYNC);
   //make_textures(); // make all textures need to display on
   make_atoms();
@@ -170,17 +166,17 @@ void display_manager::setup() {
 
 void display_manager::make_atoms() {
   IMG_Init(IMG_INIT_PNG);
-  SDL_Surface *s_temp = IMG_Load("new_img/a11.png");
+  SDL_Surface *s_temp = IMG_Load("img/a1.png");
   SDL_Texture *t1  = SDL_CreateTextureFromSurface(w_ren,s_temp);
   value_maps.insert({1,t1});
   SDL_FreeSurface(s_temp);
 
-  s_temp = IMG_Load("new_img/a22.png");
+  s_temp = IMG_Load("img/a2.png");
   t1  = SDL_CreateTextureFromSurface(w_ren,s_temp);
   value_maps.insert({2,t1});
   SDL_FreeSurface(s_temp);
 
-  s_temp = IMG_Load("new_img/a33.png");
+  s_temp = IMG_Load("img/a3.png");
   t1  = SDL_CreateTextureFromSurface(w_ren,s_temp);
   value_maps.insert({3,t1});
   SDL_FreeSurface(s_temp);
@@ -195,7 +191,7 @@ void display_manager::print_location() {
     for(int j=1 ;j<=5;j++) {
 
 
-    SDL_Rect *temp = boxes[i+5*(j-1)].location;
+    coordinates *temp = &boxes[i+5*(j-1)]->location;
   //  cout<<"( "<<temp->x<< " , "<<temp->y<<" )  ";
   }
   cout<<endl;
@@ -234,8 +230,8 @@ void display_manager::run() {
 
 bool display_manager::update() {
   bool updated = true;
-  for (int i=0;i<game_details->x*game_details->y;i++) {
-    if(!boxes[i].update())
+  for (pair<int,box*> p_box : &boxes ) {
+    if(!p_box.second->update())
       updated = false;
   }
   if(delete_req){
@@ -288,6 +284,7 @@ void display_manager::set_surrounding() {
   int rows =game_details->y;
   for (int i=0;i<rows*cols;i++) { // for each pair in the &boxes
        switch ( boxes[i].type ) {
+         int *p = &a;
 
          // check each type and then add the surrounding &boxes
          // surrounding means when it expands where will the atoms go
@@ -356,10 +353,11 @@ void display_manager::set_surrounding() {
 
 void display_manager::set_type() {
 
+  &boxes[0]->type = type::RC;
   int cols = game_details->x;
   int rows = game_details->y;
   int i=0;
-  boxes[i].type=type::TOPLC;
+  boxes[i].type==type::TOPLC;
   boxes[i].max = 1;
   for(i=1;i<cols-1;i++) { // for the first row
 
@@ -371,7 +369,7 @@ void display_manager::set_type() {
   boxes[i].type = type::TOPRC;
   boxes[i].max =1; //sets maximum
 
-  for(;i<(rows-1)*cols;i++) {
+  for(;i<(rows-1)*cols);i++) {
 
          if(i%cols==0){
            boxes[i].type = type::LEFT; // if it is on the left
@@ -388,7 +386,7 @@ void display_manager::set_type() {
   }
   boxes[i].type = type::BOTTOMLC; // bottom row left
   boxes[i].max =1; //sets maximum
-  for(;i<rows*cols-1;i++) { // bottom row
+  for(;i<rows*cols;i++) { // bottom row
 
           boxes[i].type = type::BOTTOM;
            boxes[i].max =2;
@@ -403,33 +401,40 @@ void display_manager::set_type() {
 void display_manager::render_atom_count() {
   box *temp = nullptr; // set the bopx operating on
   int holding =0;
-  SDL_Rect r_text ;
-  r_text.w = game_details->w;
-  r_text.h =game_details->h;
-  for (int i=0;i<game_details->x*game_details->y;i++) { // go in range of &boxes
+  for (int i=0;i<=game_details->x*game_details->y;i++) { // go in range of &boxes
     temp = &boxes[i];
     holding = temp->holding;
 
-    if (temp->color) {
+
+    if (holding) {
       texture_mod(holding,0);
-      SDL_SetTextureColorMod(value_maps[holding],temp->color->r,temp->color->g,temp->color->b);
+      SDL_SetTextureColorMod(value_maps[holding],temp->color.r,temp->color.g,temp->color.b);
+      if (holding==1) {
+        r_text.w=50;
+        r_text.h =50;
         r_text.x = temp->location->x;
         r_text.y = temp->location->y;
+      }
+      else{
+        r_text.w=80;
+        r_text.h =80;
+        r_text.x = temp->location->x-10;
+        r_text.y = temp->location->y-10;
 }
 
 SDL_RenderCopyEx(w_ren,value_maps[holding],nullptr,&r_text,temp->rotation,nullptr,SDL_FLIP_NONE);
 texture_mod(holding,1);
 }
   }
-
+}
 
 //------------------------------------------------------------------------------
 
 display_manager::~display_manager() {
   for (int i=0;i<game_details->x*game_details->y;i++) {
-    alloc.destroy(boxes+i);
+    alloc.destroy(&boxes[i]);
   }
-  alloc.deallocate(boxes,game_details->x*game_details->y);
+  alloc.deallocate(&boxes[0],game_details->x*game_details->y);
 
   for (auto a: value_maps) {
     SDL_DestroyTexture(a.second);

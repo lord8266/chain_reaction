@@ -16,36 +16,34 @@ enum  type { // these are just constants to make it easier to
 };
 
 class box {
+  friend class player;
+  friend class display_manager;
+  friend class animation;
 public:
-  box(const int&,const int&,const int&,display_manager*); //constructor for box
-
-  //color of the ball
-  int id ;    //id of the box
-  coordinates *location;    //pointer to location of this box
-
-
- /* basically if balls comes in and touches here then receive event queue
-  add up
-  */
-
-  set<receive_results*> event_queue; //a queue for when some ball has touched the com
-  int max ;  //the maximum
-  int holding =0; //the no it hold right now
-
-  display_manager *displayer = nullptr; // has everything to output graphics
+  box(const int&,const SDL_Rect&,display_manager*); //constructor for box
   bool process_events(); //iterate through all events and tell if it it did something
-  void explode(receive_results*);  // when it overflows
-  void received(receive_results*);
+  void explode();  // when it overflows
+  void received(animation*);
   bool update();
   void reset_color();
-  set<box*> surrounding; //pointers to surrounding boxes
-  int type; //the type of the box;
-  player *owner = nullptr;
   ~box();
-public: // rotation and com
+
+private:
+  display_manager *displayer = nullptr;
+  set<animation*> event_queue;
+  set<box*> surrounding;
+  player *owner = nullptr;
+  int location_id;
+private:
+  int max ;  //the maximum
+  int holding =0; //the no it hold right now
+  int type; //the type of the box;
+
+private: // rotation and com
   double rotation = 0.0;
-  SDL_Point com;
-  SDL_Color color;
+  SDL_Rect *location=nullptr;
+  SDL_Color *color;
+
 };
 
 #endif
