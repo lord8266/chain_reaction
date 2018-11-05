@@ -390,6 +390,9 @@ void display_manager::set_type() {
            boxes[i].max =3; //sets maximum
          }
   }
+  boxes[i].type=type::BOTTOMLC;
+  boxes[i].max = 1;
+  i++;
 
   for(;i<rows*cols-1;i++) { // bottom row
 
