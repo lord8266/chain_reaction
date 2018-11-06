@@ -9,10 +9,14 @@
 #include <cstdio>
 #include <cmath>
 #include <memory>
+#include <fstream>
+#include <sstream>
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
+using std::ifstream;
+using std::istringstream;
 using std::allocator;
 using std::pair;
 using std::set;
@@ -37,7 +41,6 @@ class animation;
 
 
 #include "game_base.h"
-#include "player.h"
 #include "receive_results.h"
 #include "coordinates.h"
 #include "box.h"

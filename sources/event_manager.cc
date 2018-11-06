@@ -31,7 +31,8 @@ void event_manager::handle_click() {
 
 
   x = x/connection->game_details->w;
-  y = y/connection->game_details->h;
+  y = y/connection->game_details->h; 
+  //convert into rows and cols of the allocated array
 
   connection->user_event(x+connection->game_details->x*y); // generate id and send the event
 }

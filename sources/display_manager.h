@@ -5,7 +5,7 @@
 
 class display_manager {
 public:
-  display_manager(const SDL_Rect&); //constructor for display_manager
+  display_manager(const vector<player*>& ,const SDL_Rect&); //constructor for display_manager
   void add_animation(box* to,box* from); // balls goes to where from where
   // when box explodes this is called to add animation
   void run() ; //run the game loop
@@ -27,6 +27,8 @@ public:
   void setup(); // function to initialize the sdl side
   void quit(); // a function to quit everything
   void remove_animation(animation*);
+  void end_texture_create();
+  void render_end_game();
   ~display_manager();
 
 public:
@@ -37,7 +39,7 @@ public:
   bool deleted = false;
   bool delete_req = false;
   bool check = false;
-
+  bool end_displaying = false;
 public:
   SDL_Window *w1 = nullptr; // window pointer
   SDL_Renderer * w_ren =nullptr; //pointer to renderer
@@ -49,6 +51,11 @@ public:
 public:
   game_base *game_control =nullptr;
   allocator<box> alloc;
+public:
+  SDL_Texture *ending =nullptr;
+  SDL_Texture *ending2 = nullptr;
+  SDL_Rect endpos;
+  SDL_Rect endpos2;
 };
 
 #endif

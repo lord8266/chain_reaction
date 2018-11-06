@@ -6,9 +6,9 @@
 class player {
 public:
   player(const int&,const int&,const int&,game_base*);
-  bool compare_color(box*);
+  bool compare_owner(box*);
+  void add_box(box*);
   void update() { holding++;}
-  game_base *connection =nullptr;
   SDL_Color *color=nullptr;
   int holding=0;
 };

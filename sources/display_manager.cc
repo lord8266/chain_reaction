@@ -3,11 +3,11 @@
 
 #include "display_manager.h"
 
-display_manager::display_manager(const SDL_Rect& r):
+display_manager::display_manager(const vector<player*> &data,const SDL_Rect& r):
 boxes(nullptr),
 e1(new event_manager(this)),
 game_details(new SDL_Rect(r)),
-game_control(new game_base(this)) { //initalize both sets to nothing
+game_control(new game_base(data,this)) { //initalize both sets to nothing
                                                     //set is the same as in python
                                                     // make a event handler to handle events
 SDL_Rect temp;
@@ -82,6 +82,30 @@ void display_manager::process_events() {
 }
 }
 
+void display_manager::end_texture_create() {
+  TTF_Init(); // initialize ttf
+  TTF_Font *temp_font = TTF_OpenFont("textures/arial.ttf",25); // take font from arial
+  player *winner = *(game_control->current); // make a color variable
+  string msg = winner->name + " wins  " ;
+  string msg2 = "while owning "+ std::to_string(winner->holding) + " boxes";
+  SDL_Surface *temp = TTF_RenderText_Solid(temp_font,msg.c_str(),*winner->color); // render text
+  ending = SDL_CreateTextureFromSurface(w_ren,temp);
+  int width = game_details->w*game_details->x;
+  int height =game_details->h*game_details->y;
+  endpos.x = width/3;
+  endpos.y = height/2;
+  endpos.w = temp->w;
+  endpos.h = temp->h;
+  SDL_FreeSurface(temp);
+  temp = TTF_RenderText_Solid(temp_font,msg2.c_str(),*winner->color); // render text
+  ending2 = SDL_CreateTextureFromSurface(w_ren,temp);
+
+  endpos2.x = width/3-45;
+  endpos2.y = height/2+ endpos.h;
+  endpos2.w = temp->w;
+  endpos2.h = temp->h;
+  SDL_FreeSurface(temp);
+}
 //----------------------------------------------------------------------
 
 void display_manager::quit(){
@@ -164,7 +188,7 @@ void display_manager::setup() {
   for (int i=0;i!=num;i++) {
     cout<<"driver : "<<SDL_GetVideoDriver(i)<<endl;
   }
-  w1 = SDL_CreateWindow("test",640,480,width,height,SDL_WINDOW_SHOWN);
+  w1 = SDL_CreateWindow("chainreaction2d",640,480,width,height,SDL_WINDOW_SHOWN);
   w_ren = SDL_CreateRenderer(w1,-1,SDL_RENDERER_ACCELERATED| SDL_RENDERER_PRESENTVSYNC);
   //make_textures(); // make all textures need to display on
   make_atoms();
@@ -227,6 +251,7 @@ void display_manager::run() {
     temp_running = update(); //call update
    render(); //call render
    if (check) {
+     update();
      run_check();
    }
    running = current.size()==0 && temp_running;
@@ -261,6 +286,20 @@ void display_manager::render() {
   SDL_RenderClear(w_ren);
   draw_grid();
   render_atom_count();
+  if(end_displaying) {
+    SDL_Rect r_temp;
+    r_temp.x = endpos.x-endpos.w/2-55;
+    r_temp.y =endpos.y-5;
+    r_temp.w = endpos.w+endpos2.w+10;
+    r_temp.h = endpos.h+endpos2.h+10;
+    color_change(0);
+    SDL_SetRenderDrawColor(w_ren,255,255,255,255);
+    SDL_RenderFillRect(w_ren,&r_temp);
+    color_change(1);
+    SDL_RenderCopy(w_ren,ending,nullptr,&endpos);
+    SDL_RenderCopy(w_ren,ending2,nullptr,&endpos2);
+
+  }
   color_change(0);
   SDL_SetRenderDrawColor(w_ren,30,40,50,60);
   for( animation* a_anim: current) {

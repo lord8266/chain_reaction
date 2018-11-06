@@ -3,17 +3,33 @@
 
 #include "main.h"
 
+class player {
+public:
+  player(const string&,const SDL_Color&) ;
+  bool compare_owner(box*);
+  void add_box(box*);
+public:
+  SDL_Color *color = nullptr;
+  int holding;
+public:
+  string name;
+  player *next =nullptr;
+  player *previous = nullptr;
+};
+
 class game_base {
 public:
-  game_base(display_manager*);
+  game_base(const vector<player*>&,display_manager*);
   void user_event(const int&);
-  void cycle();
+  void check_holding(player*,vector<player*>&);
+  void shrink(player*);
+  bool cycle();
   void update();
-  vector<player*> players;
+
   display_manager *connection = nullptr;
-  player *current = nullptr;
   int player_cnt;
   int current_cnt;
+  player **current = nullptr;
 };
 
 #endif

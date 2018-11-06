@@ -11,21 +11,15 @@ color->b=b;
 
 //----------------------------------------------------------------------
 
-bool player::compare_color(box* b_check) {
-  bool ret = false;
-  SDL_Color *c_check = b_check->color;
-  if (!c_check){
-    b_check->owner = this;
-    b_check->color = color;
-    holding++;
-    ret =true;
+bool player::compare_owner(box* b_check) {
+  bool ret =true;
+  if (!b_check->owner){ //if it doesnt have a owner
+    add_box(b_check);
   }
   else {
-    if ((c_check->r==color->r) && (c_check->g==color->g) && (c_check->b==color->b)) {
+    //if there is a owner and check if it tis the same owner
 
-      ret = true;
-    }
-    else {
+    if (b_check->owner!=this) {
       ret = false;
     }
   }
@@ -33,3 +27,9 @@ bool player::compare_color(box* b_check) {
 }
 
 //----------------------------------------------------------------------
+
+void player::add_box(box* b){
+  b->owner = this;
+  b->color =color;
+  holding++; //add to holding
+}

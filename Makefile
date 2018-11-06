@@ -4,7 +4,7 @@ all:
 	cd sources && make
 	mv sources/$(P) ./
 
-rebuild: clear all
+rebuild: clean all
 
 clean:
 	rm sources/*.o
