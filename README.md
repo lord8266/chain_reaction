@@ -14,7 +14,7 @@ As soon as a player looses all their orbs they are out of the game.
 ###
 
 ## Status : Not Completed  
-  i will contiue when i have time  
+  i will continue when i have time  
 
   look at gameplays for how it looks  
   look at log.txt for how the code moves
