@@ -42,6 +42,7 @@ class state {
       bool add(int row,int col,int player=0,bool force=false);
       void print();
       bool step();
+      void complete();
    private:
       layout board;
       vector<explosion> ongoing;

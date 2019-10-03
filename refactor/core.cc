@@ -84,7 +84,7 @@ bool state::step() {
    for (auto p :a) {
       add(p.to.row,p.to.col,p.player);
    }
-   return ongoing.size()==0;
+   return ongoing.size();
 }
 
 void state::print() {
@@ -95,6 +95,10 @@ void state::print() {
       cout<<endl;
    }
    cout<<endl;
+}
+
+void state::complete() {
+   while(step());
 }
 
 
