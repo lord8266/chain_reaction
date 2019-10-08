@@ -27,6 +27,13 @@
     layout *board;
     list *ongoing;
     update_func update;
+    player *players;
+    int *alive;
+};
+
+struct player {
+  int start;
+  int color;
 };
 
 struct explosion {

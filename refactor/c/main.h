@@ -12,6 +12,7 @@ typedef struct state state;
 typedef struct explosion explosion;
 typedef struct list list;
 typedef struct node node;
+typedef struct player player;
 typedef void(*update_func)(int,int) ;
 #include "list.h"
 #include "core.h"
