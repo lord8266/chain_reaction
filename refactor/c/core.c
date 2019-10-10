@@ -188,6 +188,7 @@ int add(state *s,int i,int j,int player,int force) {
         p.col = b->position.col;
         e.player = player;
         e.from = p;
+        e.completed =1;
         for (int i=0;i<4;i++) {
             if (b->index[i]==1) {
                 p.row = b->surrounding[i].row;
@@ -214,10 +215,10 @@ int step(state *s) {
     explosion *e_copy = malloc(sizeof(explosion));
     int size;
     for ( int i=0;i<s->ongoing->len;i++) {
-        explosion *e = curr->data;
-        if (1) { //improvise
-            push(l,e,sizeof(explosion));
+        int explosion_completed = ((explosion*)curr->data)->completed;
+        if (explosion_completed) { //improvise
             curr = delete(s->ongoing,i,e_copy,&size);
+            push(l,e_copy,sizeof(explosion));
             i--;
         }
     }

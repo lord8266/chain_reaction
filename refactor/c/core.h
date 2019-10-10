@@ -44,6 +44,7 @@ struct explosion {
     pos from;
     pos to;
     int player;
+    int completed;
 };
 void write_box(box *b,int row,int col,int max,pos *p,int *index);
 layout *alloc_layout(int rows,int cols);
