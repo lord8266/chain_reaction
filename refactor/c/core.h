@@ -26,14 +26,18 @@
  struct state {
     layout *board;
     list *ongoing;
-    update_func update;
+    // update_func update;
     player *players;
     int *alive;
+    int curr;
+    int n_players;
+    int completed;
 };
 
 struct player {
   int start;
   int color;
+  int n;
 };
 
 struct explosion {
@@ -47,10 +51,14 @@ void print_layout(layout *l);
 void print_atoms(layout *l);
 void dealloc_layout(layout *l);
 void dealloc_box(box *b);
-state *alloc_state(int,int,update_func);
+void dealloc_player(player *p);
+state *alloc_state(int,int,player *players,int size);
 void dealloc_state(state *s);
+player *alloc_player(int color);
 int step(state *s);
 int add(state *s,int i,int j,int player,int force);
+void continue_game(state *s);
 void complete(state *s);
-void update(int,int);
+void update(state *s,int,int);
+void write_player(player *p,int);
 #endif

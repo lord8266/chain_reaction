@@ -6,7 +6,7 @@ void write_box(box *b,int row,int col,int max,pos *p,int *index) {
     b->atoms = 0;
     b->max =max;
     b->surrounding  = p;
-    b->player =0;
+    b->player =-1;
     memcpy(b->index,index,16);
 }
 
@@ -93,33 +93,93 @@ void dealloc_box(box *b) {
    
 }
 
-state* alloc_state(int rows,int cols,update_func u) {
+
+state* alloc_state(int rows,int cols,player *players,int size) {
     state *s = malloc(sizeof(state));
     s->board = alloc_layout(rows,cols);
     s->ongoing = alloc_list();
-    s->update =u;
+    // s->update =u;
+    s->players = malloc(sizeof(player)*size);
+    memcpy(s->players,players,size);
+    s->alive = malloc(4*size);
+    for (int i=0;i<size;i++) {
+        s->alive[i] =1;
+    }
+    s->curr = 0;
+    s->completed = 0;
+    s->n_players = size;
     return s; 
+}
+
+player *alloc_player(int color) {
+    player *p = malloc(sizeof(player));
+    p->start =0;
+    p->color = color;
+    p->n = 0;
+    return p;
+}
+
+void write_player(player *p,int color) {
+    p->start =0;
+    p->color = color;
+    p->n = 0;
+}
+
+void cycle(state *s) {
+    int i = s->curr;
+    int curr = (i+1)%s->n_players;
+    while (i!=curr && !s->alive[curr] ) {
+        curr = (curr+1)%s->n_players;
+    }
+    if (i==curr) {
+        s->completed  = 1;
+    }
+    else {
+        s->curr = curr;
+    }
 }
 
 void dealloc_state(state *s) {
     dealloc_layout(s->board);
     dealloc_list(s->ongoing);
+    for (int i=0;i<s->n_players;i++) {
+        dealloc_player(&s->players[i]);
+    }
+    free(s->alive);
     free(s);
+}
+
+void dealloc_player(player *p) {
+    free(p);
+}
+
+void continue_game(state *s) {
+    int p =s->curr;
+    int i,j;
+    printf("p: %d ->",p);
+    scanf("%d %d",&i,&j);
+    while (!add(s,i,j,p,0)){
+        printf("(i) p: %d ->",p);
+        scanf("%d %d",&i,&j);
+    }
+    complete(s);
+    cycle(s);
+    print_atoms(s->board);
 }
 
 int add(state *s,int i,int j,int player,int force) {
     box *b = &s->board->boxes[i*s->board->cols+j];
-    if (!force && !(b->player==player || b->player==0)) {
+    if (!force && !(b->player==player || b->player==-1)) {
         return 0;
     }
     if (!force) {
-        s->update(player,1);
+        update(s,player,1);
     }
     else {
         if (b->player!=player) {
-            s->update(player,b->atoms);
-            if (b->player!=0)
-                s->update(b->player,-b->atoms);
+            update(s,player,b->atoms);
+            if (b->player!=-1)
+                update(s,b->player,-b->atoms);
         }
     }
 
@@ -173,9 +233,11 @@ int step(state *s) {
     return s->ongoing->len;
 
 }
+
 void complete(state *s) {
     while(step(s));
 }
+
 void print_atoms(layout *l) {
     for (int i=0;i<l->rows;i++) {
         for (int j=0;j<l->cols;j++) {
@@ -186,8 +248,13 @@ void print_atoms(layout *l) {
     }
 }
 
-void update(int p1,int u1) {
-    putchar('\n');
-    printf("%d updates by %d\n",p1,u1);
-    putchar('\n');
+void update(state *s,int p1,int u1) {
+    player *p = &s->players[p1];
+    p->start =1;
+    p->n+=u1;
+    printf("update %d: %d\n",p1,u1);
+    if (p->n==0) {
+        s->alive[p1] = 0;
+        printf("kill %d\n",p1);
+    }
 }
