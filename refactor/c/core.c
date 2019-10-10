@@ -100,7 +100,7 @@ state* alloc_state(int rows,int cols,player *players,int size) {
     s->ongoing = alloc_list();
     // s->update =u;
     s->players = malloc(sizeof(player)*size);
-    memcpy(s->players,players,size);
+    memcpy(s->players,players,sizeof(player)*size);
     s->alive = malloc(4*size);
     for (int i=0;i<size;i++) {
         s->alive[i] =1;
@@ -131,26 +131,21 @@ void cycle(state *s) {
     while (i!=curr && !s->alive[curr] ) {
         curr = (curr+1)%s->n_players;
     }
-    if (i==curr) {
-        s->completed  = 1;
-    }
-    else {
-        s->curr = curr;
-    }
+    
+    s->curr = curr;
+    
 }
 
 void dealloc_state(state *s) {
     dealloc_layout(s->board);
     dealloc_list(s->ongoing);
-    for (int i=0;i<s->n_players;i++) {
-        dealloc_player(&s->players[i]);
-    }
+    free(s->players);
     free(s->alive);
     free(s);
 }
 
 void dealloc_player(player *p) {
-    free(p);
+    // free(p);
 }
 
 void continue_game(state *s) {
@@ -163,8 +158,10 @@ void continue_game(state *s) {
         scanf("%d %d",&i,&j);
     }
     complete(s);
-    cycle(s);
-    print_atoms(s->board);
+    if (!s->completed) {
+        cycle(s);
+        print_atoms(s->board);
+    }
 }
 
 int add(state *s,int i,int j,int player,int force) {
@@ -209,7 +206,9 @@ return 1;
 }
 
 int step(state *s) {
-
+    if (s->completed)
+        return 0;
+    
     node *curr = s->ongoing->head;
     list *l = alloc_list();
     explosion *e_copy = malloc(sizeof(explosion));
@@ -257,4 +256,12 @@ void update(state *s,int p1,int u1) {
         s->alive[p1] = 0;
         printf("kill %d\n",p1);
     }
+    int c = 0;
+    for (int i=0;i<s->n_players;i++) {
+        if (s->alive[i]) {
+            c+=1;
+            
+        }
+    }
+    s->completed = c==1;
 }

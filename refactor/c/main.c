@@ -28,5 +28,5 @@ int main() {
     while (!s->completed) {
         continue_game(s);
     }
-
+    dealloc_state(s);
 }
