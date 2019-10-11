@@ -55,6 +55,7 @@ void dealloc_box(box *b);
 void dealloc_player(player *p);
 state *alloc_state(int,int,player *players,int size);
 void dealloc_state(state *s);
+void write_explosion(explosion *e,pos from,pos to,int player);
 player *alloc_player(int color);
 int step(state *s);
 int add(state *s,int i,int j,int player,int force);

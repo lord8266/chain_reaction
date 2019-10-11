@@ -4,7 +4,14 @@
 #include <SDL.h>
 
 struct animation {
-    pos curr;
-    
+    explosion *e;
+
+};
+
+struct render {
+    SDL_Window *w;
+    SDL_Renderer *r;
+    state *s;
+    list ongoing;
 };
 #endif

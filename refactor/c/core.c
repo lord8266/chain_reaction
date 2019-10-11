@@ -135,6 +135,12 @@ void cycle(state *s) {
     s->curr = curr;
     
 }
+void write_explosion(explosion *e,pos from,pos to,int player) {
+    e->from = from;
+    e->to = to;
+    e->player =player;
+    e->completed =1;
+}
 
 void dealloc_state(state *s) {
     dealloc_layout(s->board);
@@ -183,17 +189,9 @@ int add(state *s,int i,int j,int player,int force) {
     if (b->atoms==b->max) {
         b->atoms =0;
         explosion e;
-        pos p;
-        p.row = b->position.row;
-        p.col = b->position.col;
-        e.player = player;
-        e.from = p;
-        e.completed =1;
         for (int i=0;i<4;i++) {
             if (b->index[i]==1) {
-                p.row = b->surrounding[i].row;
-                p.col = b->surrounding[i].col;
-                e.to = p;
+                write_explosion(&e,b->position,b->surrounding[i],player);
                 push(s->ongoing,&e,sizeof(e));
             }   
         }
@@ -220,6 +218,9 @@ int step(state *s) {
             curr = delete(s->ongoing,i,e_copy,&size);
             push(l,e_copy,sizeof(explosion));
             i--;
+        }
+        else {
+            curr = curr->next;
         }
     }
     curr = l->head;
