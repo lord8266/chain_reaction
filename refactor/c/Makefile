@@ -2,7 +2,7 @@ P=main
 pks= sdl2 SDL2_image SDL2_ttf
 CFLAGS=-Wall -Werror -Wno-unused-variable -g -Wno-unused-value  `pkg-config --cflags $(pks)`
 
-OBJECTS=core.o list.o
+OBJECTS=core.o list.o render.o
 LDLIBS= `pkg-config --libs $(pks)`
 
 all: main.h main.c $(OBJECTS)
@@ -13,3 +13,6 @@ core.o: core.c core.h
 
 list.o: list.c list.h
 	gcc $(CFLAGS) -c list.c -o list.o
+
+render.o: render.c render.h
+	gcc $(CFLAGS) -c render.c -o render.o

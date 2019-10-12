@@ -108,20 +108,21 @@ state* alloc_state(int rows,int cols,player *players,int size) {
     s->curr = 0;
     s->completed = 0;
     s->n_players = size;
+    s->r = NULL;
     return s; 
 }
 
-player *alloc_player(int color) {
+player *alloc_player(color c) {
     player *p = malloc(sizeof(player));
     p->start =0;
-    p->color = color;
+    p->c = c;
     p->n = 0;
     return p;
 }
 
-void write_player(player *p,int color) {
+void write_player(player *p,color c) {
     p->start =0;
-    p->color = color;
+    p->c = c;
     p->n = 0;
 }
 
@@ -154,20 +155,20 @@ void dealloc_player(player *p) {
     // free(p);
 }
 
-void continue_game(state *s) {
+int continue_game(state *s,int i,int j) {
     int p =s->curr;
-    int i,j;
-    printf("p: %d ->",p);
-    scanf("%d %d",&i,&j);
-    while (!add(s,i,j,p,0)){
-        printf("(i) p: %d ->",p);
-        scanf("%d %d",&i,&j);
+
+    if (add(s,i,j,p,0)){
+       complete(s);
+        if (!s->completed) {
+            cycle(s);
+        }
+        return 1;
     }
-    complete(s);
-    if (!s->completed) {
-        cycle(s);
-        print_atoms(s->board);
+    else {
+        return 0;
     }
+    
 }
 
 int add(state *s,int i,int j,int player,int force) {

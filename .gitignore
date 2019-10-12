@@ -2,4 +2,6 @@ chain
 *.o
 .*
 refactor/c/textures
+refactor/c/main
+
 .vscode
