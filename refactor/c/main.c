@@ -19,10 +19,13 @@
 
 int main() {
     player p[3];
-    color c ={0,0,0,255};
-    write_player(&p[0],c);
-    write_player(&p[1],c);
-    write_player(&p[2],c);
+        color c[3] ={   {255,0,0,255},
+                        {0,255,0,255},
+                        {0,0,255,255}
+                    };
+    write_player(&p[0],c[0]);
+    write_player(&p[1],c[1]);
+    write_player(&p[2],c[2]);
     base *b = alloc_base(640,640,6,6,p,3);
     print_layout(b->s->board);
     print_atoms(b->s->board);

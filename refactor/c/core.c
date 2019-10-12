@@ -196,7 +196,7 @@ int add(state *s,int i,int j,int player,int force) {
                 push(s->ongoing,&e,sizeof(e));
             }   
         }
-        b->player =0;
+        b->player =-1;
     }
     else {
         b->player = player;
@@ -213,19 +213,19 @@ int step(state *s) {
     list *l = alloc_list();
     explosion *e_copy = malloc(sizeof(explosion));
     int size;
-    for ( int i=0;i<s->ongoing->len;i++) {
+    while(curr) {
         int explosion_completed = ((explosion*)curr->data)->completed;
         if (explosion_completed) { //improvise
-            curr = delete(s->ongoing,i,e_copy,&size);
+            curr = delete(s->ongoing,curr,e_copy,&size);
             push(l,e_copy,sizeof(explosion));
-            i--;
         }
         else {
             curr = curr->next;
         }
     }
+
     curr = l->head;
-    for (int i=0;i<l->len;i++) {
+    while(curr) {
         explosion *e  =curr->data;
         add(s,e->to.row,e->to.col,e->player,1);
         curr =curr->next;
