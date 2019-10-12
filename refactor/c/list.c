@@ -45,24 +45,23 @@ void push(list *l,void *data,int size) {
     l->len+=1;
 }
 
-node *delete(list *l,int pos,void *data,int *size) {
+node *delete(list *l,node* n,void *data,int *size) {
 
     if(l->len>=1) {
-        int i =0;
         node *curr = l->head;
         node *prev = NULL;
-        while ( curr && i!=pos ) {
+        while (curr!=n ) {
             prev =curr;
             curr =curr->next;
-            i++;
         }
-        if (i==pos) {
+
+        if (curr==n) {
             node *ret =NULL;
             node *n =curr->next;
             ret = n;
             if (data) {
-            memcpy(data,curr->data,curr->size);
-            *size = curr->size;
+                memcpy(data,curr->data,curr->size);
+                *size = curr->size;
             }
             dealloc_node(curr);
             if (prev==NULL) {
@@ -76,21 +75,63 @@ node *delete(list *l,int pos,void *data,int *size) {
             return ret;
         }  
     }
+    
     return NULL;
+    
 }
 
-// void print(list *l) {
-//     node *curr = l->head;
-//     for (int i=0;i<l->len;i++) {
-//         printf("%d\n",*(int*)curr->data);
-//         curr =curr->next;
-//     }
-// }
+node *delete_pos(list *l,int pos,void *data,int *size) {
+
+    if(l->len>=1) {
+        int i =0;
+        node *curr = l->head;
+        node *prev = NULL;
+        while (curr &&  i!=pos) {
+            prev =curr;
+            curr =curr->next;
+            i+=1;
+        }
+
+        if (i==pos) {
+            node *ret =NULL;
+            node *n =curr->next;
+            ret = n;
+            if (data) {
+                memcpy(data,curr->data,curr->size);
+                *size = curr->size;
+            }
+            dealloc_node(curr);
+            if (prev==NULL) {
+                l->head = n;
+            }
+            else {
+                prev->next = n;
+            }
+
+            l->len-=1;
+            return ret;
+        }  
+    }
+    
+    return NULL;
+    
+}
+
+void print(list *l) {
+    node *curr = l->head;
+    for (int i=0;i<l->len;i++) {
+        printf("%d\n",*(int*)curr->data);
+        curr =curr->next;
+    }
+}
 // int main() {
 //     int i[10] ={1,2,3,4,5,6,7,8,9,10};
 //     list *l = alloc_list();
 //     push(l,(void*)&i[0],4);
 //     push(l,(void*)&i[1],4);
+//     node *t = delete_pos(l,0,NULL,NULL);
+//     printf("%d\n",*(int*)t->data);
+//     // node *tdelete(l,l->head,NULL,NULL);
 //     print(l);
 //     dealloc_list(l);
 // }
