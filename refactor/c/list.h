@@ -16,7 +16,7 @@ list* alloc_list();
 void dealloc_list(list *);
 
 node *alloc_node(void *data,int size);
-void push(list*,void*,int);
+node* push(list*,void*,int);
 node *delete(list* l,node* n,void *data,int *size);
 node *delete_pos(list *l,int pos,void *data,int *size);
 

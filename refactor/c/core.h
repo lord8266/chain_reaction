@@ -34,7 +34,7 @@ struct color {
     int curr;
     int n_players;
     int completed;
-    renderer *r;
+    base *b;
 };
 
 struct player {
@@ -57,7 +57,7 @@ void print_atoms(layout *l);
 void dealloc_layout(layout *l);
 void dealloc_box(box *b);
 void dealloc_player(player *p);
-state *alloc_state(int,int,player *players,int size);
+state *alloc_state(int,int,player *players,int size,base *b);
 void dealloc_state(state *s);
 void write_explosion(explosion *e,pos from,pos to,int player);
 player *alloc_player(color c);
@@ -67,4 +67,5 @@ int continue_game(state *s,int i,int j);
 void complete(state *s);
 void update(state *s,int,int);
 void write_player(player *p,color);
+void cycle(state *s);
 #endif

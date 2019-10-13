@@ -32,7 +32,7 @@ node *alloc_node(void *data,int size) {
     return n;
 }
 
-void push(list *l,void *data,int size) {
+node * push(list *l,void *data,int size) {
     node *in = alloc_node(data,size);
     if (l->len==0) {
         l->head = in;   
@@ -43,6 +43,7 @@ void push(list *l,void *data,int size) {
         curr->next = in;
     }
     l->len+=1;
+    return in;
 }
 
 node *delete(list *l,node* n,void *data,int *size) {

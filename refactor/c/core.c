@@ -94,7 +94,7 @@ void dealloc_box(box *b) {
 }
 
 
-state* alloc_state(int rows,int cols,player *players,int size) {
+state* alloc_state(int rows,int cols,player *players,int size,base *b) {
     state *s = malloc(sizeof(state));
     s->board = alloc_layout(rows,cols);
     s->ongoing = alloc_list();
@@ -108,7 +108,7 @@ state* alloc_state(int rows,int cols,player *players,int size) {
     s->curr = 0;
     s->completed = 0;
     s->n_players = size;
-    s->r = NULL;
+    s->b = b;
     return s; 
 }
 
@@ -140,7 +140,7 @@ void write_explosion(explosion *e,pos from,pos to,int player) {
     e->from = from;
     e->to = to;
     e->player =player;
-    e->completed =1;
+    e->completed =0;
 }
 
 void dealloc_state(state *s) {
@@ -157,12 +157,10 @@ void dealloc_player(player *p) {
 
 int continue_game(state *s,int i,int j) {
     int p =s->curr;
-
-    if (add(s,i,j,p,0)){
-       complete(s);
-        if (!s->completed) {
+    int ret = add(s,i,j,p,0);
+    if (ret){
+        if (ret==1)
             cycle(s);
-        }
         return 1;
     }
     else {
@@ -173,6 +171,7 @@ int continue_game(state *s,int i,int j) {
 
 int add(state *s,int i,int j,int player,int force) {
     box *b = &s->board->boxes[i*s->board->cols+j];
+    int ret=1;
     if (!force && !(b->player==player || b->player==-1)) {
         return 0;
     }
@@ -193,20 +192,22 @@ int add(state *s,int i,int j,int player,int force) {
         for (int i=0;i<4;i++) {
             if (b->index[i]==1) {
                 write_explosion(&e,b->position,b->surrounding[i],player);
-                push(s->ongoing,&e,sizeof(e));
+                node *n = push(s->ongoing,&e,sizeof(e));
+                new_animation(s->b,(explosion*)n->data,2);
             }   
         }
         b->player =-1;
+        ret =2;
     }
     else {
         b->player = player;
         b->atoms++;
     }
-return 1;
+return ret;
 }
 
 int step(state *s) {
-    if (s->completed)
+    if (s->completed || s->ongoing->len==0)
         return 0;
     
     node *curr = s->ongoing->head;
@@ -232,7 +233,7 @@ int step(state *s) {
     }
     dealloc_list(l);
     free(e_copy);
-    return s->ongoing->len;
+    return 1;
 
 }
 

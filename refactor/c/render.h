@@ -10,16 +10,20 @@ struct textures {
     SDL_Rect rect;
 };
 
-
-
 struct animation {
     explosion *e;
+    float speed;
+    float curr_pos[2];
+    float end_pos[2];
+    int direction;
+    int type;
 };
 
 struct box_renderer {
     box *b;
-    int rotation;
-    int speed;
+    float rotation;
+    float speed;
+    int direction;
 };
 struct renderer {
     SDL_Window *w;
@@ -52,4 +56,9 @@ textures* alloc_textures();
 void dealloc_textures(textures *);
 void draw_atoms(base *b);
 void render_box(box_renderer *br,int i,int j,textures *tr,player *p,SDL_Renderer *r);
+animation* alloc_animation(explosion *e,float speed);
+void new_animation(base *b,explosion *e,float speed);
+void dealloc_animation(animation *a);
+node* delete_animation(base *b,node *a);
+int update_animation(animation *a);
 #endif

@@ -3,7 +3,6 @@
 renderer *alloc_renderer(state *s,int width,int height) {
     renderer *r = malloc(sizeof(renderer));
     r->s = s;
-    s->r = r;
     r->width = width;
     r->height = height;
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -18,7 +17,9 @@ renderer *alloc_renderer(state *s,int width,int height) {
 
     for (int i=0;i<size;i++) {
         r->br[i].b = &board->boxes[i];
-        r->br[i].rotation = r->br->speed = 0;
+        r->br[i].rotation = 0;
+        r->br[i].speed = 10;
+        r->br[i].direction  = 1;
     }
     return r;
 }
@@ -26,7 +27,10 @@ renderer *alloc_renderer(state *s,int width,int height) {
 void render_box(box_renderer *br,int i,int j,textures *tr,player *p,SDL_Renderer *r) {
     box *b = br->b;
     int a = b->atoms;
+    br->rotation  +=br->speed*br->direction;
 
+    if (br->rotation>360)
+        br->rotation-=360;
     color c = p->c;
     switch (a)
     {
@@ -34,21 +38,21 @@ void render_box(box_renderer *br,int i,int j,textures *tr,player *p,SDL_Renderer
         tr->rect.x = j*tr->rect.w;
         tr->rect.y = i*tr->rect.h;
         SDL_SetTextureColorMod(tr->one,c.r,c.g,c.b);
-        SDL_RenderCopy(r,tr->one,NULL,&tr->rect);
+        SDL_RenderCopyEx(r,tr->one,NULL,&tr->rect,br->rotation,NULL,SDL_FLIP_NONE);
         break;
 
     case 2:
         tr->rect.x = j*tr->rect.w;
         tr->rect.y = i*tr->rect.h;
         SDL_SetTextureColorMod(tr->two,c.r,c.g,c.b);
-        SDL_RenderCopy(r,tr->two,NULL,&tr->rect);
+        SDL_RenderCopyEx(r,tr->two,NULL,&tr->rect,br->rotation,NULL,SDL_FLIP_NONE);
         break;
 
     case 3:
         tr->rect.x = j*tr->rect.w;
         tr->rect.y = i*tr->rect.h;
         SDL_SetTextureColorMod(tr->three,c.r,c.g,c.b);
-        SDL_RenderCopy(r,tr->three,NULL,&tr->rect);
+        SDL_RenderCopyEx(r,tr->three,NULL,&tr->rect,br->rotation,NULL,SDL_FLIP_NONE);
         break;
 
     default:
@@ -122,14 +126,18 @@ void update_state(base *b,int i,int j) {
 }
 void run(base *b) {
     SDL_Event e;
+    list *l = b->r->ongoing;
+    b->running = !b->s->completed;
     while(SDL_PollEvent(&e)) {
         if (e.type==SDL_QUIT) {
             b->running = 0;
         }
-        else if (e.type==SDL_MOUSEBUTTONDOWN) {
+        else if (e.type==SDL_MOUSEBUTTONDOWN && !l->len) {
             mouse_event(b,&e);
         }
     }
+    
+
     color c = b->s->players[ b->s->curr].c;
 
     SDL_SetRenderDrawColor(b->r->r,0,0,0,0);
@@ -137,13 +145,38 @@ void run(base *b) {
 
     draw_grid(b->r,c,b->s->board->rows,b->s->board->rows);
     draw_atoms(b); 
+
+    node *curr = l->head;
+    if (curr) {
+        while(curr) {
+            animation *a = (animation*)curr->data;
+            if (update_animation(a)) {
+                curr =delete_animation(b,curr);
+            }
+            else {
+                SDL_Rect *r = &b->t->rect;
+                r->x = a->curr_pos[0];
+                r->y = a->curr_pos[1];
+                printf("%d\n",c.r);
+                SDL_SetTextureColorMod(b->t->glow,c.r,c.g,c.b);
+                SDL_RenderCopy(b->r->r,b->t->glow,NULL,r);
+                curr = curr->next;
+            }
+        }
+        if (l->len==0 &&  !b->s->completed) {
+            step(b->s);
+            if (b->s->ongoing->len==0)
+                cycle(b->s);
+        }
+    }
+   
     SDL_RenderPresent(b->r->r);
 
-} SDL_Texture *two;
-    SDL_Texture *three;
+}
+
 base* alloc_base(int width,int height,int rows,int cols,player *players,int size) {
     base *b = malloc(sizeof(base));
-    b->s = alloc_state(rows,cols,players,size);
+    b->s = alloc_state(rows,cols,players,size,b);
     b->r = alloc_renderer(b->s,width,height);
     b->t = alloc_textures(b);
     b->running = 1;
@@ -185,3 +218,63 @@ void dealloc_textures(textures *t) {
     IMG_Quit();
     free(t);
 }
+
+animation* alloc_animation(explosion *e,float speed) {
+    animation *a =malloc(sizeof(animation));
+    a->e = e;
+    a->speed = speed;
+    return a;
+}
+
+void new_animation(base *b,explosion *e,float speed) {
+
+    animation *a = alloc_animation(e,speed);
+    pos f = e->from,t = e->to;
+    int width = b->t->rect.w, height=b->t->rect.h;
+   
+    a->curr_pos[0] = e->from.col*width;
+    a->curr_pos[1] = e->from.row*height;
+    a->end_pos[0] = e->to.col*width;
+    a->end_pos[1] = e->to.row*height;
+
+    if (f.col==t.col) {
+        a->type = 0;
+        if (a->end_pos[1]>a->curr_pos[1]) 
+            a->direction = 1;
+        else
+            a->direction = -1;
+    }
+    else if (f.row==t.row) {
+        if (a->end_pos[0]>a->curr_pos[0]) 
+            a->direction = 1;
+        else
+            a->direction = -1;
+        a->type =1;
+    }
+    
+
+    push(b->r->ongoing,a,sizeof(animation));
+    dealloc_animation(a);
+
+}
+
+node* delete_animation(base *b,node *n) {
+    ((animation*)n->data)->e->completed = 1;
+    return delete(b->r->ongoing,n,NULL,NULL);
+}
+void dealloc_animation(animation *a) {
+    free(a);
+} 
+
+int update_animation(animation *a) {
+    if (a->type==0) {
+        a->curr_pos[1]+=(a->speed*a->direction);
+        return ((a->end_pos[1]-a->curr_pos[1])*a->direction)<1;
+    }
+    else {
+        a->curr_pos[0]+=(a->speed*a->direction);
+        return ((a->end_pos[0]-a->curr_pos[0])*a->direction)<1;
+    }
+}
+
+
