@@ -1,10 +1,18 @@
-P=chain
-#im no makefile expert
-all:
-	cd sources && make
-	mv sources/$(P) ./
+P=main
+pks= sdl2 SDL2_image SDL2_ttf
+CFLAGS=-Wall -Werror -Wno-unused-variable -g -Wno-unused-value  `pkg-config --cflags $(pks)`
 
-rebuild: clean all
+OBJECTS=core.o list.o render.o
+LDLIBS= `pkg-config --libs $(pks)`
 
-clean:
-	rm sources/*.o
+all: main.h main.c $(OBJECTS)
+	gcc $(CFLAGS) main.c $(OBJECTS) -o $(P) $(LDLIBS)
+
+core.o: core.c core.h
+	gcc $(CFLAGS) -c core.c -o core.o
+
+list.o: list.c list.h
+	gcc $(CFLAGS) -c list.c -o list.o
+
+render.o: render.c render.h
+	gcc $(CFLAGS) -c render.c -o render.o

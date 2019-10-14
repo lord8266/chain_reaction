@@ -1,2 +1,5 @@
-chain
 *.o
+.*
+textures
+main
+.vscode
