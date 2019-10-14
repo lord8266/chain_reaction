@@ -12,3 +12,29 @@ adding an extra orb and claiming the cell for the player.
 As soon as a player looses all their orbs they are out of the game.
 
 ###
+
+# Status
+Core game logic complete  
+Need to add menu to choose configuration   
+Only supporting linux.
+
+# Prerequisites
+This application used [SDL](https://www.libsdl.org/) ( Simple DirectMedia Layer)
+## Linux 
+Run  
+```
+sh install.sh
+```
+This will download and compile the required packages  
+Files are downloaded by default to ~/sdl_source, You can change the directory in the sh file if you want
+
+# Compiling
+```
+make
+```
+# Running the game
+```
+./main
+```
+
+
