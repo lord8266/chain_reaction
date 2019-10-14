@@ -143,7 +143,7 @@ void run(base *b) {
     SDL_SetRenderDrawColor(b->r->r,0,0,0,0);
     SDL_RenderClear(b->r->r);
 
-    draw_grid(b->r,c,b->s->board->rows,b->s->board->rows);
+    draw_grid(b->r,c,b->s->board->rows,b->s->board->cols);
     draw_atoms(b); 
 
     node *curr = l->head;
@@ -174,8 +174,10 @@ void run(base *b) {
 
 }
 
-base* alloc_base(int width,int height,int rows,int cols,player *players,int size) {
+base* alloc_base(int box_size,int rows,int cols,player *players,int size) {
     base *b = malloc(sizeof(base));
+    int width = box_size*cols;
+    int height = box_size*rows;
     b->s = alloc_state(rows,cols,players,size,b);
     b->r = alloc_renderer(b->s,width,height);
     b->t = alloc_textures(b);

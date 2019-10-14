@@ -26,7 +26,7 @@ int main() {
     write_player(&p[0],c[0]);
     write_player(&p[1],c[1]);
     write_player(&p[2],c[2]);
-    base *b = alloc_base(640,640,6,6,p,3);
+    base *b = alloc_base(100,5,10,p,3);
     print_layout(b->s->board);
     print_atoms(b->s->board);
     // while (!b->s->completed) {

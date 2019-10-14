@@ -6,6 +6,7 @@
    int row;
    int col;
 };
+
 struct color {
   Uint8 r,g,b,a;
 };

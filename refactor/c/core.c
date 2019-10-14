@@ -193,7 +193,7 @@ int add(state *s,int i,int j,int player,int force) {
             if (b->index[i]==1) {
                 write_explosion(&e,b->position,b->surrounding[i],player);
                 node *n = push(s->ongoing,&e,sizeof(e));
-                new_animation(s->b,(explosion*)n->data,2);
+                new_animation(s->b,(explosion*)n->data,5);
             }   
         }
         b->player =-1;

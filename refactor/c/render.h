@@ -46,7 +46,7 @@ struct base
 
 renderer *alloc_renderer(state*,int,int);
 void dealloc_renderer(renderer*);
-base* alloc_base(int width,int height,int rows,int cols,player *players,int size);
+base* alloc_base(int box_size,int rows,int cols,player *players,int size);
 void dealloc_base(base *b);
 void draw_grid(renderer *r,color c,int rows,int cols);
 void run(base *b);

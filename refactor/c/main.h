@@ -5,6 +5,7 @@
 #include <string.h>
 #include <SDL.h>
 #include <SDL_image.h>
+
 typedef struct pos pos;
 typedef struct box box;
 typedef struct layout layout;
