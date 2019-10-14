@@ -21,12 +21,12 @@ Only supporting linux.
 # Prerequisites
 This application used [SDL](https://www.libsdl.org/) ( Simple DirectMedia Layer)
 ## Linux 
-Run  
 ```
 sh install.sh
 ```
 This will download and compile the required packages  
-Files are downloaded by default to ~/sdl_source, You can change the directory in the sh file if you want
+Files are downloaded by default to ~/sdl_source  
+You can change the directory in the sh file if you want
 
 # Compiling
 ```
