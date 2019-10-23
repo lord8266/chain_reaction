@@ -1,6 +1,7 @@
 #Number of threads to use for compile
 #default : Number of cores
-nproc= $(nproc)
+nproc=2
+# nproc= $(nproc)
 
 # Change prefix to where you want to download sdl source
 prefix=~/sdl_source
