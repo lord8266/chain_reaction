@@ -15,7 +15,7 @@ struct color {
     pos position;
     int atoms;
     int max;
-    pos *surrounding;
+    pos surrounding[4];
     int index[4];
 };
 
@@ -26,16 +26,25 @@ struct color {
    box *boxes; 
 };
 
+struct save {
+  box *boxes;
+  player *players;
+  int *alive;
+  int curr;
+};
+
  struct state {
-    layout *board;
-    list *ongoing;
-    // update_func update;
-    player *players;
-    int *alive;
-    int curr;
-    int n_players;
-    int completed;
-    base *b;
+  layout *board;
+  list *ongoing;
+  // update_func update;
+  player *players;
+  int *alive;
+  int curr;
+  int n_players;
+  int completed;
+  base *b;
+  queue *checkpoints;
+  save* prev;
 };
 
 struct player {
@@ -69,4 +78,8 @@ void complete(state *s);
 void update(state *s,int,int);
 void write_player(player *p,color);
 void cycle(state *s);
+save* alloc_save(base *b);
+void dealloc_save(save *s);
+int rollback(base *b);
+void checkpoint(base*);
 #endif

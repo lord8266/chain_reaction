@@ -5,9 +5,9 @@ void write_box(box *b,int row,int col,int max,pos *p,int *index) {
     b->position.col =col; 
     b->atoms = 0;
     b->max =max;
-    b->surrounding  = p;
+    memcpy(b->surrounding,p,sizeof(pos)*4);
     b->player =-1;
-    memcpy(b->index,index,16);
+    memcpy(b->index,index,sizeof(int)*4);
 }
 
 pos *neighbours(int i,int j,int rows,int cols,int *index,int *size) {
@@ -59,6 +59,7 @@ layout *alloc_layout(int rows,int cols) {
             int size;
             pos *p =neighbours(i,j,rows,cols,index,&size);
             write_box(&b[i*cols+j],i,j,size-1,p,index);
+            free(p);
         }
     }
     l->boxes =b;
@@ -80,20 +81,51 @@ void print_layout(layout *l) {
 }
 
 void dealloc_layout(layout *l) {
-    for (int i=0;i<(l->rows*l->cols);i++) {
-        box *b = &l->boxes[i];
-        dealloc_box(b);
-    }
     free(l->boxes);
     free(l);
 }
 
-void dealloc_box(box *b) {
-    free(b->surrounding);
-   
+void checkpoint(base *b) {
+
+    push_queue(b->s->checkpoints,b->s->prev);
+    printf("SIze: %d\n",b->s->checkpoints->l->len);
+    save *p = b->s->prev;
+    b->s->prev = alloc_save(b);
+    free(p);
 }
 
+int rollback(base *b) {
+    
+    if (b->s->checkpoints->l->len) {
+        save *prev = malloc(sizeof(save));
+        pop_queue(b->s->checkpoints,prev);
+        list *ongoing_state = b->s->ongoing;
+        node *curr  = ongoing_state->head;
+        while(curr) {
+            curr = delete(ongoing_state,curr,NULL,NULL,free);
+        }
+        ongoing_state->len = 0;
+        list *ongoing_animations = b->r->ongoing;
+        curr  = ongoing_animations->head;
+        while(curr) {
+            curr = delete(ongoing_animations,curr,NULL,NULL,free);
+        }
+        int rows = b->s->board->rows;
+        int cols = b->s->board->cols;
 
+        memcpy(b->s->board->boxes,prev->boxes,sizeof(box)*rows*cols);
+        memcpy(b->s->players,prev->players,sizeof(player)*b->s->n_players);
+        memcpy(b->s->alive,prev->alive,sizeof(int)*b->s->n_players);
+        b->s->curr = prev->curr;
+        dealloc_save(b->s->prev);
+        b->s->prev = prev;
+        return 1;
+    }
+    else {
+        return 0;
+    }
+
+}
 state* alloc_state(int rows,int cols,player *players,int size,base *b) {
     state *s = malloc(sizeof(state));
     s->board = alloc_layout(rows,cols);
@@ -109,6 +141,8 @@ state* alloc_state(int rows,int cols,player *players,int size,base *b) {
     s->completed = 0;
     s->n_players = size;
     s->b = b;
+    s->checkpoints = alloc_queue(30);
+
     return s; 
 }
 
@@ -148,6 +182,8 @@ void dealloc_state(state *s) {
     dealloc_list(s->ongoing);
     free(s->players);
     free(s->alive);
+    dealloc_save(s->prev);
+    dealloc_queue(s->checkpoints);
     free(s);
 }
 
@@ -217,7 +253,7 @@ int step(state *s) {
     while(curr) {
         int explosion_completed = ((explosion*)curr->data)->completed;
         if (explosion_completed) { //improvise
-            curr = delete(s->ongoing,curr,e_copy,&size);
+            curr = delete(s->ongoing,curr,e_copy,&size,free);
             push(l,e_copy,sizeof(explosion));
         }
         else {
@@ -251,6 +287,26 @@ void print_atoms(layout *l) {
     }
 }
 
+
+save* alloc_save(base *b) {
+    int rows =b->s->board->rows ,cols=b->s->board->cols;
+    save *s = malloc(sizeof(save));
+    s->alive =malloc(sizeof(int)*b->s->n_players);
+    s->boxes = malloc(sizeof(box)*rows*cols);
+    s->players = malloc(sizeof(player)*b->s->n_players);
+
+    memcpy(s->boxes,b->s->board->boxes,sizeof(box)*rows*cols);
+    memcpy(s->players,b->s->players,sizeof(player)*b->s->n_players);
+    memcpy(s->alive,b->s->alive,sizeof(int)*b->s->n_players);
+    s->curr = b->s->curr;
+    return s;
+}
+void dealloc_save(save *s) {
+    free(s->boxes);
+    free(s->players);
+    free(s->alive);
+    free(s);
+}
 void update(state *s,int p1,int u1) {
     player *p = &s->players[p1];
     p->start =1;
@@ -263,8 +319,7 @@ void update(state *s,int p1,int u1) {
     int c = 0;
     for (int i=0;i<s->n_players;i++) {
         if (s->alive[i]) {
-            c+=1;
-            
+            c+=1; 
         }
     }
     s->completed = c==1;

@@ -60,8 +60,6 @@ void render_box(box_renderer *br,int i,int j,textures *tr,player *p,SDL_Renderer
     }
 }
 
-
-
 void dealloc_renderer(renderer *r) {
     SDL_Quit();
     dealloc_list(r->ongoing);
@@ -102,27 +100,25 @@ void draw_atoms(base *b) {
     }
 }
 
-void mouse_event(base *b,SDL_Event *e) {
+int mouse_event(base *b,SDL_Event *e) {
     float _r,_c;
     _r = (e->button.y+0.0)/b->r->height*b->s->board->rows;
     _c = (e->button.x+0.0)/b->r->width*b->s->board->cols;
     int r = (int)_r,c=(int)_c;
     printf("%d %d\n",r,c);
-    update_state(b,r,c);
+    return update_state(b,r,c);
 
 }
 
-void update_state(base *b,int i,int j) {
+int update_state(base *b,int i,int j) {
     int r = continue_game(b->s,i,j);
     if (r) {
-        putchar('\n');
-        print_atoms(b->s->board);
-        putchar('\n');
-        printf("%d\n",b->s->curr);
+       
     }
     else {
-        printf("\nUnavailable\n\n");
+        printf("Unavailable\n");
     }
+    return r;
 }
 void run(base *b) {
     SDL_Event e;
@@ -133,7 +129,18 @@ void run(base *b) {
             b->running = 0;
         }
         else if (e.type==SDL_MOUSEBUTTONDOWN && !l->len) {
-            mouse_event(b,&e);
+           if( mouse_event(b,&e) ){
+                checkpoint(b);
+           }
+        }
+        else if(e.type==SDL_KEYDOWN) {
+            if (e.key.keysym.sym==SDLK_a) {
+                
+            }
+            else if (e.key.keysym.sym==SDLK_b) {
+                if(rollback(b))
+                    return;
+            }
         }
     }
     
@@ -157,7 +164,6 @@ void run(base *b) {
                 SDL_Rect *r = &b->t->rect;
                 r->x = a->curr_pos[0];
                 r->y = a->curr_pos[1];
-                printf("%d\n",c.r);
                 SDL_SetTextureColorMod(b->t->glow,c.r,c.g,c.b);
                 SDL_RenderCopy(b->r->r,b->t->glow,NULL,r);
                 curr = curr->next;
@@ -165,7 +171,7 @@ void run(base *b) {
         }
         if (l->len==0 &&  !b->s->completed) {
             step(b->s);
-            if (b->s->ongoing->len==0)
+            if (l->len==0)
                 cycle(b->s);
         }
     }
@@ -182,6 +188,7 @@ base* alloc_base(int box_size,int rows,int cols,player *players,int size) {
     b->r = alloc_renderer(b->s,width,height);
     b->t = alloc_textures(b);
     b->running = 1;
+    b->s->prev =alloc_save(b);
     return b;
 } 
 
@@ -262,7 +269,7 @@ void new_animation(base *b,explosion *e,float speed) {
 
 node* delete_animation(base *b,node *n) {
     ((animation*)n->data)->e->completed = 1;
-    return delete(b->r->ongoing,n,NULL,NULL);
+    return delete(b->r->ongoing,n,NULL,NULL,free);
 }
 void dealloc_animation(animation *a) {
     free(a);
