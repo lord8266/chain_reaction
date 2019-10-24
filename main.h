@@ -20,8 +20,7 @@ typedef struct base base;
 typedef struct color color;
 typedef struct textures textures;
 typedef struct box_renderer box_renderer;
-typedef struct save save;
-typedef struct queue queue;
+typedef struct stack stack;
 
 // typedef void(*update_func)(int,int) ;
 #include "list.h"

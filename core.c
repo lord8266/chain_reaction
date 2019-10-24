@@ -86,39 +86,40 @@ void dealloc_layout(layout *l) {
 }
 
 void checkpoint(base *b) {
+    int size = b->s->save_box_size + b->s->save_player_size + b->s->save_alive_size + sizeof(int);
+    push_stack(b->s->checkpoints,b->s->prev,size);
+    save_state(b);
+}
 
-    push_queue(b->s->checkpoints,b->s->prev);
-    printf("SIze: %d\n",b->s->checkpoints->l->len);
-    save *p = b->s->prev;
-    b->s->prev = alloc_save(b);
-    free(p);
+void *save_state(base *b) {
+    void *v = b->s->prev;
+    int off = 0;
+    memcpy(v+off,b->s->board->boxes,b->s->save_box_size);
+    off = b->s->save_box_size;
+    memcpy(v+off,b->s->players,b->s->save_player_size);
+    off+=b->s->save_player_size;
+    memcpy(v+off,b->s->alive,b->s->save_alive_size);
+    off+=b->s->save_alive_size;
+    memcpy(v+off,&b->s->curr,sizeof(int));
+    return v;
 }
 
 int rollback(base *b) {
     
     if (b->s->checkpoints->l->len) {
-        save *prev = malloc(sizeof(save));
-        pop_queue(b->s->checkpoints,prev);
-        list *ongoing_state = b->s->ongoing;
-        node *curr  = ongoing_state->head;
-        while(curr) {
-            curr = delete(ongoing_state,curr,NULL,NULL,free);
-        }
-        ongoing_state->len = 0;
-        list *ongoing_animations = b->r->ongoing;
-        curr  = ongoing_animations->head;
-        while(curr) {
-            curr = delete(ongoing_animations,curr,NULL,NULL,free);
-        }
-        int rows = b->s->board->rows;
-        int cols = b->s->board->cols;
-
-        memcpy(b->s->board->boxes,prev->boxes,sizeof(box)*rows*cols);
-        memcpy(b->s->players,prev->players,sizeof(player)*b->s->n_players);
-        memcpy(b->s->alive,prev->alive,sizeof(int)*b->s->n_players);
-        b->s->curr = prev->curr;
-        dealloc_save(b->s->prev);
-        b->s->prev = prev;
+        
+        void *v = peek_stack(b->s->checkpoints)->data;
+        remove_all(b->s->ongoing);
+        remove_all(b->r->ongoing);
+        int off =0;
+        memcpy(b->s->board->boxes,v,b->s->save_box_size);
+        off+=b->s->save_box_size;
+        memcpy(b->s->players,v+off,b->s->save_player_size);
+        off+=b->s->save_player_size;
+        memcpy(b->s->alive,v+off,b->s->save_alive_size);
+        off+=b->s->save_alive_size;
+        memcpy(&b->s->curr,v+off,sizeof(int));
+        pop_stack(b->s->checkpoints,b->s->prev,NULL);        
         return 1;
     }
     else {
@@ -141,8 +142,12 @@ state* alloc_state(int rows,int cols,player *players,int size,base *b) {
     s->completed = 0;
     s->n_players = size;
     s->b = b;
-    s->checkpoints = alloc_queue(30);
-
+    s->checkpoints = alloc_stack(30);
+    s->save_box_size = sizeof(box)*rows*cols;
+    s->save_player_size = sizeof(player)*s->n_players;
+    s->save_alive_size = sizeof(int)*s->n_players;
+    int sl = s->save_box_size+s->save_player_size+s->save_alive_size+sizeof(int);
+    s->prev = malloc(sl);
     return s; 
 }
 
@@ -182,8 +187,8 @@ void dealloc_state(state *s) {
     dealloc_list(s->ongoing);
     free(s->players);
     free(s->alive);
-    dealloc_save(s->prev);
-    dealloc_queue(s->checkpoints);
+    free(s->prev);
+    dealloc_stack(s->checkpoints);
     free(s);
 }
 
@@ -253,7 +258,7 @@ int step(state *s) {
     while(curr) {
         int explosion_completed = ((explosion*)curr->data)->completed;
         if (explosion_completed) { //improvise
-            curr = delete(s->ongoing,curr,e_copy,&size,free);
+            curr = delete(s->ongoing,curr,e_copy,&size);
             push(l,e_copy,sizeof(explosion));
         }
         else {
@@ -288,25 +293,6 @@ void print_atoms(layout *l) {
 }
 
 
-save* alloc_save(base *b) {
-    int rows =b->s->board->rows ,cols=b->s->board->cols;
-    save *s = malloc(sizeof(save));
-    s->alive =malloc(sizeof(int)*b->s->n_players);
-    s->boxes = malloc(sizeof(box)*rows*cols);
-    s->players = malloc(sizeof(player)*b->s->n_players);
-
-    memcpy(s->boxes,b->s->board->boxes,sizeof(box)*rows*cols);
-    memcpy(s->players,b->s->players,sizeof(player)*b->s->n_players);
-    memcpy(s->alive,b->s->alive,sizeof(int)*b->s->n_players);
-    s->curr = b->s->curr;
-    return s;
-}
-void dealloc_save(save *s) {
-    free(s->boxes);
-    free(s->players);
-    free(s->alive);
-    free(s);
-}
 void update(state *s,int p1,int u1) {
     player *p = &s->players[p1];
     p->start =1;

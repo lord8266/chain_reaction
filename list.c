@@ -4,18 +4,30 @@ list* alloc_list() {
     list *s = malloc(sizeof(list));
     s->len = 0;
     s->head = NULL;
+    s->end = NULL;
     return s;
 }
 
-void dealloc_node(node *n,void(*dealloc)(void* )) {
-    dealloc(n->data);
+void dealloc_node(node *n) {
+    free(n->data);
     free(n);
+}
+
+void remove_all(list *l) {
+    node *n = l->head;
+    for (int i=0;i<l->len;i++) {
+        node *t = n->next;
+        dealloc_node(n);
+        n = t;
+    }
+    l->head = l->end = NULL;
+    l->len = 0;
 }
 void dealloc_list(list *l) {
     node *n = l->head;
     for (int i=0;i<l->len;i++) {
         node *t = n->next;
-        dealloc_node(n,free);
+        dealloc_node(n);
         n = t;
     }
     free(l);
@@ -34,18 +46,20 @@ node *alloc_node(void *data,int size) {
 node * push(list *l,void *data,int size) {
     node *in = alloc_node(data,size);
     if (l->len==0) {
-        l->head = in;   
+        l->head = in;  
+        l->end = in; 
     }
     else {
         node *curr = l->head;
         while (curr->next && (curr=curr->next));
         curr->next = in;
+        l->end = in;
     }
     l->len+=1;
     return in;
 }
 
-node *delete(list *l,node* n,void *data,int *size,void(*dealloc)(void*)) {
+node *delete(list *l,node* n,void *data,int *size) {
 
     if(l->len>=1) {
         node *curr = l->head;
@@ -65,15 +79,20 @@ node *delete(list *l,node* n,void *data,int *size,void(*dealloc)(void*)) {
             if (size) {
                 *size = curr->size;
             }
-            dealloc_node(curr,dealloc);
+            if (curr==l->end) {
+                l->end = prev;
+            }
+
+            dealloc_node(curr);
+
             if (prev==NULL) {
                 l->head = n;
             }
             else {
                 prev->next = n;
             }
-
             l->len-=1;
+            
             return ret;
         }  
     }
@@ -103,7 +122,12 @@ node *delete_pos(list *l,int pos,void *data,int *size) {
             }
             if (size)
                  *size = curr->size;
-            dealloc_node(curr,free);
+
+            if (curr==l->end) {
+                l->end = prev;
+            }
+
+            dealloc_node(curr);
             if (prev==NULL) {
                 l->head = n;
             }
@@ -120,36 +144,37 @@ node *delete_pos(list *l,int pos,void *data,int *size) {
     
 }
 
-queue *alloc_queue(int max) {
-    queue *q = malloc(sizeof(queue));
+stack *alloc_stack(int max) {
+    stack *q = malloc(sizeof(stack));
     q->l = alloc_list();
     q->max = max;
     return q;
 }
-void d(void* v) {
-    dealloc_save(v);
+
+node *peek_stack(stack *q) {
+    return q->l->end;
 }
-void dealloc_queue(queue *q) {
+
+void dealloc_stack(stack *q) {
     node *curr = q->l->head;
     while(curr) {
-        curr = delete(q->l,curr,NULL,NULL,d);
+        curr = delete(q->l,curr,NULL,NULL);
     }
     dealloc_list(q->l);
     free(q);
 }
-void push_queue(queue *q,save *data) {
+void push_stack(stack *q,void *data,int size) {
     
     if (q->max==q->l->len) {
-        save *s= malloc(sizeof(save));
-        delete_pos(q->l,0,s,NULL);
-        dealloc_save(s);
+        delete_pos(q->l,0,NULL,NULL);
     }
-    push(q->l,data,sizeof(save));
+
+    push(q->l,data,size);
 }
 
-int pop_queue(queue *q,save *s) {
+int pop_stack(stack *q,void *data,int *size) {
     if (q->l->len) {
-        delete_pos(q->l,q->l->len-1,s,NULL);
+        delete_pos(q->l,q->l->len-1,data,size);
         return 1;
     }
     else {
@@ -167,12 +192,27 @@ void print(list *l) {
 
 // int main() {
 //     int i[10] ={1,2,3,4,5,6,7,8,9,10};
-//     list *l = alloc_list();
-//     push(l,(void*)&i[0],4);
-//     push(l,(void*)&i[1],4);
-//     node *t = delete_pos(l,0,NULL,NULL);
-//     printf("%d\n",*(int*)t->data);
-//     // node *tdelete(l,l->head,NULL,NULL);
-//     print(l);
-//     dealloc_list(l);
+//     // list *l = alloc_list();
+//     // push(l,&i[0],sizeof(int));
+//     // push(l,&i[1],sizeof(int));
+//     // node *t = delete_pos(l,0,NULL,NULL);
+//     // // node *tdelete(l,l->head,NULL,NULL);
+//     // print(l);
+
+//     // dealloc_list(l);
+
+//     stack *q = alloc_stack(100);
+//     push_stack(q,i+9,sizeof(int));
+//     printf("%p %p\n",q->l->end,q->l->head);
+//     node *n = peek_stack(q);
+//     push_stack(q,i+3,sizeof(int));
+    
+//     printf("%d\n",*(int*)(n->data));
+//     pop_stack(q,NULL,NULL);
+//     n = peek_stack(q);
+//     printf("%d\n",*(int*)(n->data));
+    
+//     pop_stack(q,NULL,NULL);
+//     printf("%p\n",q->l->end);
+    
 // }

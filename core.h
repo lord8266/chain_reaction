@@ -26,12 +26,6 @@ struct color {
    box *boxes; 
 };
 
-struct save {
-  box *boxes;
-  player *players;
-  int *alive;
-  int curr;
-};
 
  struct state {
   layout *board;
@@ -43,8 +37,11 @@ struct save {
   int n_players;
   int completed;
   base *b;
-  queue *checkpoints;
-  save* prev;
+  stack *checkpoints;
+  void* prev;
+  int save_box_size;
+  int save_player_size;
+  int save_alive_size;
 };
 
 struct player {
@@ -78,8 +75,9 @@ void complete(state *s);
 void update(state *s,int,int);
 void write_player(player *p,color);
 void cycle(state *s);
-save* alloc_save(base *b);
-void dealloc_save(save *s);
+void* get_state(base *b);
 int rollback(base *b);
-void checkpoint(base*);
+void *save_state(base*);
+void checkpoint(base *b);
+
 #endif

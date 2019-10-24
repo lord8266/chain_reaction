@@ -188,7 +188,7 @@ base* alloc_base(int box_size,int rows,int cols,player *players,int size) {
     b->r = alloc_renderer(b->s,width,height);
     b->t = alloc_textures(b);
     b->running = 1;
-    b->s->prev =alloc_save(b);
+    save_state(b);
     return b;
 } 
 
@@ -269,7 +269,7 @@ void new_animation(base *b,explosion *e,float speed) {
 
 node* delete_animation(base *b,node *n) {
     ((animation*)n->data)->e->completed = 1;
-    return delete(b->r->ongoing,n,NULL,NULL,free);
+    return delete(b->r->ongoing,n,NULL,NULL);
 }
 void dealloc_animation(animation *a) {
     free(a);
