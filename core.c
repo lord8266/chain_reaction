@@ -101,7 +101,6 @@ void save_state(base *b) {
     memcpy(v+off,b->s->alive,b->s->save_alive_size);
     off+=b->s->save_alive_size;
     memcpy(v+off,&b->s->curr,sizeof(int));
-    return v;
 }
 
 int rollback(base *b) {
