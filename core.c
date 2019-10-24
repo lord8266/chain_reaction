@@ -91,7 +91,7 @@ void checkpoint(base *b) {
     save_state(b);
 }
 
-void *save_state(base *b) {
+void save_state(base *b) {
     void *v = b->s->prev;
     int off = 0;
     memcpy(v+off,b->s->board->boxes,b->s->save_box_size);

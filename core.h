@@ -10,6 +10,7 @@
 struct color {
   Uint8 r,g,b,a;
 };
+
  struct box {
     int player;
     pos position;
@@ -39,6 +40,7 @@ struct color {
   base *b;
   stack *checkpoints;
   void* prev;
+
   int save_box_size;
   int save_player_size;
   int save_alive_size;
@@ -57,27 +59,34 @@ struct explosion {
     int completed;
 };
 
-void write_box(box *b,int row,int col,int max,pos *p,int *index);
+
 layout *alloc_layout(int rows,int cols);
-void print_layout(layout *l);
-void print_atoms(layout *l);
+state *alloc_state(int,int,player *players,int size,base *b);
+player *alloc_player(color c);
+void save_state(base*);
+
 void dealloc_layout(layout *l);
 void dealloc_box(box *b);
 void dealloc_player(player *p);
-state *alloc_state(int,int,player *players,int size,base *b);
 void dealloc_state(state *s);
+
+void write_box(box *b,int row,int col,int max,pos *p,int *index);
+void write_player(player *p,color);
 void write_explosion(explosion *e,pos from,pos to,int player);
-player *alloc_player(color c);
+
 int step(state *s);
 int add(state *s,int i,int j,int player,int force);
 int continue_game(state *s,int i,int j);
-void complete(state *s);
 void update(state *s,int,int);
-void write_player(player *p,color);
 void cycle(state *s);
-void* get_state(base *b);
-int rollback(base *b);
-void *save_state(base*);
+
 void checkpoint(base *b);
+int rollback(base *b);
+
+//debug
+void print_layout(layout *l);
+void print_atoms(layout *l);
+void complete(state *s);
+
 
 #endif
