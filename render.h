@@ -25,6 +25,7 @@ struct box_renderer {
     float speed;
     int direction;
 };
+
 struct renderer {
     SDL_Window *w;
     SDL_Renderer *r;
@@ -45,20 +46,25 @@ struct base
 
 
 renderer *alloc_renderer(state*,int,int);
+void dealloc_animation(animation *a);
 void dealloc_renderer(renderer*);
+void dealloc_textures(textures *);
 base* alloc_base(int box_size,int rows,int cols,player *players,int size);
 void dealloc_base(base *b);
-void draw_grid(renderer *r,color c,int rows,int cols);
-void run(base *b);
+textures* alloc_textures();
+animation* alloc_animation(explosion *e,float speed);
+
+void new_animation(base *b,explosion *e,float speed);
+int update_animation(animation *a);
+node* delete_animation(base *b,node *a);
+
 int mouse_event(base *b,SDL_Event *e);
 int update_state(base *b,int i,int j);
-textures* alloc_textures();
-void dealloc_textures(textures *);
+
 void draw_atoms(base *b);
 void render_box(box_renderer *br,int i,int j,textures *tr,player *p,SDL_Renderer *r);
-animation* alloc_animation(explosion *e,float speed);
-void new_animation(base *b,explosion *e,float speed);
-void dealloc_animation(animation *a);
-node* delete_animation(base *b,node *a);
-int update_animation(animation *a);
+void draw_grid(renderer *r,color c,int rows,int cols);
+
+void run(base *b);
+
 #endif

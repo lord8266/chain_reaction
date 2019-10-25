@@ -50,6 +50,7 @@ struct player {
   int start;
   color c;
   int n;
+  char name[100];
 };
 
 struct explosion {
@@ -67,12 +68,11 @@ void save_state(base*);
 
 void dealloc_layout(layout *l);
 void dealloc_box(box *b);
-void dealloc_player(player *p);
 void dealloc_state(state *s);
 
 void write_box(box *b,int row,int col,int max,pos *p,int *index);
-void write_player(player *p,color);
 void write_explosion(explosion *e,pos from,pos to,int player);
+pos *neighbours(int i,int j,int rows,int cols,int *index,int *size);
 
 int step(state *s);
 int add(state *s,int i,int j,int player,int force);
